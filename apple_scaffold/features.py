@@ -95,6 +95,7 @@ def pixel_features(rgb: np.ndarray, depth: np.ndarray) -> np.ndarray:
     grey = colour.mean(axis=-1)
 
     def local_mean(a, base):
+        """Mean over a square window equivalent to ``base`` pixels at 256 px."""
         return ndimage.uniform_filter(a, size=_window(base, width), mode="nearest")
 
     texture = np.sqrt(np.maximum(local_mean(grey ** 2, 7) - local_mean(grey, 7) ** 2, 0))

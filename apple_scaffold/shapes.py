@@ -141,6 +141,7 @@ def coverage(vectors: np.ndarray, widths: np.ndarray, shape=(256, 256)) -> np.nd
     row_index = np.repeat(every[:, None], vectors.shape[0], axis=1)
 
     def add(lo, hi, sign):
+        """Add ``sign`` to every pixel in [lo, hi] of each row (difference-array trick)."""
         lo = np.clip(lo, 0, width)
         hi = np.clip(hi + 1, 0, width)
         ok = hi > lo
@@ -206,6 +207,11 @@ class ShapeModel:
     """
 
     def fit(self, vectors: np.ndarray) -> "ShapeModel":
+        """Learn the mean shape and modes from training vectors (n_trees, d).
+
+        Uses the SVD of the centred data rather than an eigen-decomposition of
+        the covariance matrix, which avoids squaring the condition number.
+        """
         vectors = np.asarray(vectors, float)
         self.mean_ = vectors.mean(axis=0)
         _, s, vt = np.linalg.svd(vectors - self.mean_, full_matrices=False)
