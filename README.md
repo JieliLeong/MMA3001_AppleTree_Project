@@ -11,8 +11,9 @@ MMA3001 RGB-D apple-tree dataset.
 | 1 | Index, pair and audit the data; leakage-safe split by tree | done |
 | 2 | Fill holes in depth (Laplace solvers vs interpolation) | done |
 | 3 | Find scaffold pixels: baselines (average mask, colour rule) vs logistic regression, random forest, neural network | done: best model (MLP) ties the average-mask baseline, paired Dice -0.007 [-0.015, +0.002]; position features dominate |
-| 4a | Feasibility of predicting the scaffold as a shape (centreline curves + SVD modes) | built |
-| 4 | Shape-based prediction, improvement ladder, performance study | next |
+| 4a | Feasibility of predicting the scaffold as a shape (centreline curves + SVD modes) | done: representation Dice 0.91-0.96; 5 modes = 95 % of variation; oracle 5-mode Dice 0.76; ridge on a coarse summary 0.36 (baseline 0.37) |
+| 4b | Shape method: bark maps (out-of-fold), ridge / KNN / random forest / MLP regressors, Monte Carlo fuzzy band, validation ladder | built |
+| 4c | Final test (once), performance and convergence studies | next |
 
 ## Data facts that affect the method
 
@@ -35,13 +36,15 @@ apple_scaffold/holes.py              depth-hole filling: Laplace (direct, Jacobi
 apple_scaffold/features.py           per-pixel features (colour, texture, depth, position)
 apple_scaffold/baselines.py          average-mask and colour-rule baselines
 apple_scaffold/evaluate.py           Dice, IoU, centreline F1, threshold tuning, bootstrap CIs
-apple_scaffold/shapes.py             scaffold as two centreline curves; PCHIP drawing; SVD shape model
+apple_scaffold/shapes.py             scaffold as two centreline curves; PCHIP drawing; SVD shape model;
+                                     Monte Carlo probability band
 scripts/audit_dataset.py             dataset audit: completeness, image properties, split, overlays
 scripts/hole_filling_experiment.py   accuracy, cost and convergence of every fill method
 scripts/scaffold_experiment.py       Stage 3 comparison: train, tune on validation, score on test
 scripts/shape_feasibility.py         Stage 4a: representation quality, shape modes, oracle limits
+scripts/shape_method.py              Stage 4b: shape regressors and fuzzy band, validation ladder
 tests/                               pytest tests (manufactured-solution checks for the solvers)
-results/                             experiment CSVs and figures (holes, scaffold, shape_check)
+results/                             experiment CSVs and figures (holes, scaffold, shape_check, shape_method)
 ```
 
 ## Running in Google Colab
@@ -65,6 +68,9 @@ drive.mount('/content/drive')
 
 # Stage 4a shape feasibility check (training and validation trees only)
 !python scripts/shape_feasibility.py /content/data --out results/shape_check
+
+# Stage 4b shape method, validation ladder (training and validation trees only)
+!python scripts/shape_method.py /content/data --out results/shape_method
 
 !pytest -v                                   # run the tests
 !pdoc --math ./apple_scaffold -o ./docs      # HTML documentation

@@ -1,0 +1,18 @@
+{
+ "model": "ridge_bark",
+ "threshold": 0.2,
+ "modes": 8,
+ "rows": 32,
+ "samples": 200,
+ "pixels_per_tree": 500,
+ "seed": 0,
+ "validation_dice": 0.42112843864217586,
+ "validation_cl_f1": 0.3800131478558892,
+ "load_s": 32.09,
+ "bark_s": 264.4,
+ "fit_ridge_coarse_s": 1.08,
+ "fit_ridge_bark_s": 0.89,
+ "fit_knn_s": 26.87,
+ "fit_forest_s": 9.78,
+ "fit_mlp_s": 7.75
+}

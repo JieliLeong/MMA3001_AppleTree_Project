@@ -111,6 +111,89 @@ def draw(vector: np.ndarray, widths: np.ndarray, shape=(256, 256)) -> np.ndarray
             | (np.abs(cols - x_right[:, None]) <= half[:, None]))
 
 
+def coverage(vectors: np.ndarray, widths: np.ndarray, shape=(256, 256)) -> np.ndarray:
+    """Fraction of the given shapes covering each pixel (vectorised :func:`draw`).
+
+    Parameters
+    ----------
+    vectors : ndarray (n_shapes, 2 * n_rows)
+    widths : ndarray (n_rows,)
+
+    Returns
+    -------
+    ndarray (height, width) with values in [0, 1].
+    """
+    vectors = np.atleast_2d(vectors)
+    height, width = shape
+    n_rows = len(widths)
+    rows = sample_rows(height, n_rows)
+    every = np.arange(height)
+    # PCHIP along the row axis for every shape at once: result (height, n_shapes)
+    x_left = PchipInterpolator(rows, vectors[:, :n_rows].T, axis=0)(every)
+    x_right = PchipInterpolator(rows, vectors[:, n_rows:].T, axis=0)(every)
+    half = np.interp(every, rows, _fill(np.asarray(widths, float), rows.astype(float))) / 2
+    lo_l = np.ceil(x_left - half[:, None]).astype(int)
+    hi_l = np.floor(x_left + half[:, None]).astype(int)
+    lo_r = np.ceil(x_right - half[:, None]).astype(int)
+    hi_r = np.floor(x_right + half[:, None]).astype(int)
+    # union of the two intervals per (row, shape); counts via difference arrays
+    counts = np.zeros((height, width + 1), np.int32)
+    row_index = np.repeat(every[:, None], vectors.shape[0], axis=1)
+
+    def add(lo, hi, sign):
+        lo = np.clip(lo, 0, width)
+        hi = np.clip(hi + 1, 0, width)
+        ok = hi > lo
+        np.add.at(counts, (row_index[ok], lo[ok]), sign)
+        np.add.at(counts, (row_index[ok], hi[ok]), -sign)
+
+    add(lo_l, hi_l, 1)
+    add(lo_r, hi_r, 1)
+    # where the two intervals overlap, remove the double count
+    add(np.maximum(lo_l, lo_r), np.minimum(hi_l, hi_r), -1)
+    return np.cumsum(counts, axis=1)[:, :width] / vectors.shape[0]
+
+
+def probability_map(coefficients: np.ndarray, covariance: np.ndarray, model: "ShapeModel",
+                    widths: np.ndarray, n_samples: int = 200, seed: int = 0,
+                    shape=(256, 256)) -> np.ndarray:
+    """Monte Carlo "fuzzy band": probability that each pixel is scaffold.
+
+    Shapes are sampled from a normal distribution of mode coefficients with the
+    predicted mean and the model's error covariance, drawn, and averaged. A
+    confident prediction gives a narrow band; an uncertain one a wide band.
+    With mean 0 and the training covariance (no information from the photo)
+    the result approaches the average training mask.
+
+    Assumption: prediction errors of the mode coefficients are normally
+    distributed. ``n_samples`` controls the Monte Carlo error, which falls
+    roughly like ``1 / sqrt(n_samples)``.
+    """
+    rng = np.random.default_rng(seed)
+    draws = rng.multivariate_normal(np.asarray(coefficients, float),
+                                    np.asarray(covariance, float), size=n_samples,
+                                    method="eigh")
+    return coverage(model.decode(draws), widths, shape)
+
+
+def weighted_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Share of the total shape variation predicted: R^2 pooled over all modes."""
+    residual = ((y_true - y_pred) ** 2).sum()
+    total = ((y_true - y_true.mean(axis=0)) ** 2).sum()
+    return float(1 - residual / total)
+
+
+def map_descriptor(prob: np.ndarray, grid: int = 16, columns: int = 64, bands: int = 4) -> np.ndarray:
+    """Summary of a per-pixel probability map: a ``grid x grid`` block average plus
+    column profiles in ``bands`` horizontal bands (top to bottom)."""
+    height, width = prob.shape
+    parts = [prob.reshape(grid, height // grid, grid, width // grid).mean(axis=(1, 3)).ravel()]
+    for b in range(bands):
+        band = prob[b * height // bands:(b + 1) * height // bands]
+        parts.append(band.mean(axis=0).reshape(columns, -1).mean(axis=1))
+    return np.concatenate(parts).astype(np.float32)
+
+
 class ShapeModel:
     """Mean shape plus principal modes, from the SVD of training centrelines.
 
