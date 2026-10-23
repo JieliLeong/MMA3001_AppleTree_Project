@@ -6,9 +6,12 @@ MMA3001 RGB-D apple-tree dataset.
 
 ## Status
 
-Stage 1 is done: indexing, pairing and auditing the data. Later stages
-(depth-hole filling, scaffold classification, branch curves and length) will
-be added under `apple_scaffold/`.
+| Stage | What | Status |
+|---|---|---|
+| 1 | Index, pair and audit the data; leakage-safe split by tree | done |
+| 2 | Fill holes in depth (Laplace solvers vs interpolation) | done |
+| 3 | Classify scaffold pixels (rule baseline vs ML) | next |
+| 4 | Skeleton, branch curves (smoothing splines), length (quadrature) | planned |
 
 ## Data facts that affect the method
 
@@ -20,13 +23,18 @@ Checked on tree R01N01, 23 Oct 2026; run the audit to confirm across the dataset
 | GT PNG | 256 x 256 binary (0/255) | Resize to 640 x 480 with nearest-neighbour, or evaluate at 256 x 256 |
 | GT content | Main trunk + two leaders only, drawn as a thick line | Compare centrelines with a pixel tolerance, not just mask IoU |
 | File times | `h-m-s`, not zero-padded (`12-41-4`) | Names are parsed with a regular expression |
+| Re-matched winter files | Some winter files carry a second ID: `R04N15_Winter_RGB-R04N42_RGB_12-19-45.png` | Parser accepts both forms; the second ID is kept as `source_id` |
 
 ## Layout
 
 ```
-apple_scaffold/data.py     filename parsing, frame pairing, loaders, grouped split
-scripts/audit_dataset.py   dataset audit: completeness, image properties, split, overlays
-tests/test_data.py         pytest tests
+apple_scaffold/data.py               filename parsing, frame pairing, loaders, grouped split
+apple_scaffold/holes.py              depth-hole filling: Laplace (direct, Jacobi, Gauss-Seidel, SOR)
+                                     and griddata / RBF interpolation
+scripts/audit_dataset.py             dataset audit: completeness, image properties, split, overlays
+scripts/hole_filling_experiment.py   accuracy, cost and convergence of every fill method
+tests/                               pytest tests (manufactured-solution checks for the solvers)
+results/holes/                       experiment CSVs and figures
 ```
 
 ## Running in Google Colab
@@ -41,6 +49,9 @@ drive.mount('/content/drive')
 # audit both dataset folders (edit the paths to where they sit in your Drive)
 !python scripts/audit_dataset.py "/content/drive/MyDrive/AppleTree/Dataset (With Summer GT)" \
                                  "/content/drive/MyDrive/AppleTree/Dataset" --out audit
+
+# depth-hole filling experiment (training trees only)
+!python scripts/hole_filling_experiment.py /content/data --out results/holes --frames 20
 
 !pytest -v                                   # run the tests
 !pdoc --math ./apple_scaffold -o ./docs      # HTML documentation

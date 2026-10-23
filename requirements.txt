@@ -3,5 +3,6 @@ pandas
 pillow
 scipy
 scikit-learn
+matplotlib
 pytest
 pdoc
