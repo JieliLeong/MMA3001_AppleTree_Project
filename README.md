@@ -10,8 +10,9 @@ MMA3001 RGB-D apple-tree dataset.
 |---|---|---|
 | 1 | Index, pair and audit the data; leakage-safe split by tree | done |
 | 2 | Fill holes in depth (Laplace solvers vs interpolation) | done |
-| 3 | Find scaffold pixels: baselines (average mask, colour rule) vs logistic regression, random forest, neural network | built |
-| 4 | Performance study, report figures | next |
+| 3 | Find scaffold pixels: baselines (average mask, colour rule) vs logistic regression, random forest, neural network | done: best model (MLP) ties the average-mask baseline, paired Dice -0.007 [-0.015, +0.002]; position features dominate |
+| 4a | Feasibility of predicting the scaffold as a shape (centreline curves + SVD modes) | built |
+| 4 | Shape-based prediction, improvement ladder, performance study | next |
 
 ## Data facts that affect the method
 
@@ -34,11 +35,13 @@ apple_scaffold/holes.py              depth-hole filling: Laplace (direct, Jacobi
 apple_scaffold/features.py           per-pixel features (colour, texture, depth, position)
 apple_scaffold/baselines.py          average-mask and colour-rule baselines
 apple_scaffold/evaluate.py           Dice, IoU, centreline F1, threshold tuning, bootstrap CIs
+apple_scaffold/shapes.py             scaffold as two centreline curves; PCHIP drawing; SVD shape model
 scripts/audit_dataset.py             dataset audit: completeness, image properties, split, overlays
 scripts/hole_filling_experiment.py   accuracy, cost and convergence of every fill method
 scripts/scaffold_experiment.py       Stage 3 comparison: train, tune on validation, score on test
+scripts/shape_feasibility.py         Stage 4a: representation quality, shape modes, oracle limits
 tests/                               pytest tests (manufactured-solution checks for the solvers)
-results/holes/, results/scaffold/    experiment CSVs and figures
+results/                             experiment CSVs and figures (holes, scaffold, shape_check)
 ```
 
 ## Running in Google Colab
@@ -59,6 +62,9 @@ drive.mount('/content/drive')
 
 # Stage 3 method comparison (add --fill-depth to use hole-filled depth)
 !python scripts/scaffold_experiment.py /content/data --out results/scaffold
+
+# Stage 4a shape feasibility check (training and validation trees only)
+!python scripts/shape_feasibility.py /content/data --out results/shape_check
 
 !pytest -v                                   # run the tests
 !pdoc --math ./apple_scaffold -o ./docs      # HTML documentation
