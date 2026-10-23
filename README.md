@@ -12,8 +12,9 @@ MMA3001 RGB-D apple-tree dataset.
 | 2 | Fill holes in depth (Laplace solvers vs interpolation) | done |
 | 3 | Find scaffold pixels: baselines (average mask, colour rule) vs logistic regression, random forest, neural network | done: best model (MLP) ties the average-mask baseline, paired Dice -0.007 [-0.015, +0.002]; position features dominate |
 | 4a | Feasibility of predicting the scaffold as a shape (centreline curves + SVD modes) | done: representation Dice 0.91-0.96; 5 modes = 95 % of variation; oracle 5-mode Dice 0.76; ridge on a coarse summary 0.36 (baseline 0.37) |
-| 4b | Shape method: bark maps (out-of-fold), ridge / KNN / random forest / MLP regressors, Monte Carlo fuzzy band, validation ladder | built |
-| 4c | Final test (once), performance and convergence studies | next |
+| 4b | Shape method: bark maps (out-of-fold), ridge / KNN / random forest / MLP regressors, Monte Carlo fuzzy band, validation ladder | done: ridge + band, validation Dice 0.421 vs baseline 0.370, paired +0.051 [+0.033, +0.069], better on 59/84 trees |
+| 4c | Settings (pre-stated rules) and performance: bark map, K, input grid, centreline rows, Monte Carlo M, learning curve, seeds, timing, FLOPs, memory | built |
+| 4d | Final test, once, on the 85 untouched test trees | next |
 
 ## Data facts that affect the method
 
@@ -38,13 +39,15 @@ apple_scaffold/baselines.py          average-mask and colour-rule baselines
 apple_scaffold/evaluate.py           Dice, IoU, centreline F1, threshold tuning, bootstrap CIs
 apple_scaffold/shapes.py             scaffold as two centreline curves; PCHIP drawing; SVD shape model;
                                      Monte Carlo probability band
+apple_scaffold/shape_pipeline.py     shared steps of the shape method (inputs, ridge, band, scoring)
 scripts/audit_dataset.py             dataset audit: completeness, image properties, split, overlays
 scripts/hole_filling_experiment.py   accuracy, cost and convergence of every fill method
 scripts/scaffold_experiment.py       Stage 3 comparison: train, tune on validation, score on test
 scripts/shape_feasibility.py         Stage 4a: representation quality, shape modes, oracle limits
 scripts/shape_method.py              Stage 4b: shape regressors and fuzzy band, validation ladder
+scripts/shape_settings.py            Stage 4c: settings by pre-stated rules; performance studies
 tests/                               pytest tests (manufactured-solution checks for the solvers)
-results/                             experiment CSVs and figures (holes, scaffold, shape_check, shape_method)
+results/                             experiment CSVs and figures, one folder per stage
 ```
 
 ## Running in Google Colab
@@ -71,6 +74,9 @@ drive.mount('/content/drive')
 
 # Stage 4b shape method, validation ladder (training and validation trees only)
 !python scripts/shape_method.py /content/data --out results/shape_method
+
+# Stage 4c settings and performance (training and validation trees only)
+!python scripts/shape_settings.py /content/data --out results/shape_settings
 
 !pytest -v                                   # run the tests
 !pdoc --math ./apple_scaffold -o ./docs      # HTML documentation

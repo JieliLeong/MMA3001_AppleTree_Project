@@ -43,9 +43,8 @@ import pandas as pd
 from scipy import ndimage
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.decomposition import PCA
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.linear_model import RidgeCV
 from sklearn.model_selection import GridSearchCV, KFold, cross_val_predict
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
@@ -53,17 +52,17 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from apple_scaffold import data, evaluate, shapes  # noqa: E402
+from apple_scaffold import evaluate, shapes  # noqa: E402
 from apple_scaffold.baselines import PriorMask  # noqa: E402
-from apple_scaffold.features import (FEATURE_NAMES, POSITION_FEATURES, load_frame,  # noqa: E402
-                                     pixel_features, sample_pixels)
+from apple_scaffold.features import load_frame  # noqa: E402
+from apple_scaffold.shape_pipeline import (SIZE, band_masks, bark_classifier, bark_maps,  # noqa: E402
+                                           first_pass, out_of_fold_bark_maps, ridge,
+                                           split_frames, tune_band_threshold)
 
 import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-SIZE = 256
-IMAGE_ONLY = [i for i, n in enumerate(FEATURE_NAMES) if n not in POSITION_FEATURES]
 PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
 INK, MUTED, GREY, LIGHT = "#0b0b0b", "#52514e", "#8a8984", "#9ec3ef"
 plt.rcParams.update({
@@ -75,47 +74,6 @@ plt.rcParams.update({
 MODEL_LABELS = {"ridge_coarse": "Ridge, coarse summary", "ridge_bark": "Ridge, + bark map",
                 "knn": "KNN, + bark map", "forest": "Random forest, + bark map",
                 "mlp": "Neural network, + bark map", "average": "Average of the four models"}
-
-
-# --------------------------------------------------------------------------
-# Data and inputs
-# --------------------------------------------------------------------------
-def split_frames(folders, seed):
-    files, _ = data.index_files(folders)
-    frames = data.build_frames(files)
-    frames = frames[(frames["problems"] == "") & frames["path_GT"].notna()].reset_index(drop=True)
-    labels = data.grouped_split(frames, seed=seed)
-    return frames[labels == "train"].reset_index(drop=True), frames[labels == "val"].reset_index(drop=True)
-
-
-def first_pass(frames, rng, pixels_per_tree):
-    """Masks, coarse descriptors and a balanced pixel sample (image-only features) per tree."""
-    masks, coarse, Xpix, ypix = [], [], [], []
-    for frame in frames.itertuples():
-        rgb, depth, gt = load_frame(frame, SIZE)
-        feats = pixel_features(rgb, depth)
-        idx = sample_pixels(gt, pixels_per_tree, rng)
-        masks.append(gt)
-        coarse.append(shapes.image_descriptor(rgb, depth))
-        Xpix.append(feats[idx][:, IMAGE_ONLY])
-        ypix.append(gt.ravel()[idx])
-    return masks, np.stack(coarse), Xpix, ypix
-
-
-def bark_classifier(seed):
-    return RandomForestClassifier(n_estimators=40, max_depth=14, min_samples_leaf=10,
-                                  n_jobs=-1, random_state=seed)
-
-
-def bark_maps(frames, indices, model):
-    """Bark-probability maps (image-only classifier) for the given trees."""
-    maps = {}
-    for i in indices:
-        frame = frames.iloc[i]
-        rgb, depth, _ = load_frame(frame, SIZE)
-        prob = model.predict_proba(pixel_features(rgb, depth)[:, IMAGE_ONLY])[:, 1]
-        maps[i] = prob.reshape(SIZE, SIZE).astype(np.float32)
-    return maps
 
 
 # --------------------------------------------------------------------------
@@ -138,10 +96,8 @@ def regressors(seed, n_train):
                                        learning_rate_init=1e-3, random_state=seed)),
         transformer=StandardScaler())
     return {
-        "ridge_coarse": ("coarse", Pipeline([("scale", StandardScaler()),
-                                             ("model", RidgeCV(alphas=np.logspace(-1, 5, 25)))])),
-        "ridge_bark": ("both", Pipeline([("scale", StandardScaler()),
-                                         ("model", RidgeCV(alphas=np.logspace(-1, 5, 25)))])),
+        "ridge_coarse": ("coarse", ridge()),
+        "ridge_bark": ("both", ridge()),
         "knn": ("both", knn),
         "forest": ("both", compact(RandomForestRegressor(n_estimators=300, min_samples_leaf=5,
                                                          max_features=0.5, n_jobs=-1,
@@ -163,18 +119,6 @@ def score_set(pred_masks, masks, seed):
             "cl_hi": evaluate.bootstrap_ci(cl, seed=seed)[1], "per_tree_dice": dice}
 
 
-def band_masks(coeffs, cov, model, widths, threshold, n_samples, seed):
-    return [evaluate.clean_mask(shapes.probability_map(c, cov, model, widths, n_samples,
-                                                       seed + i) >= threshold)
-            for i, c in enumerate(coeffs)]
-
-
-def tune_band_threshold(coeffs, cov, model, widths, masks, n_samples, seed):
-    maps = [shapes.probability_map(c, cov, model, widths, n_samples, seed + i)
-            for i, c in enumerate(coeffs)]
-    return evaluate.best_threshold(maps, masks)[0]
-
-
 # --------------------------------------------------------------------------
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -194,7 +138,8 @@ def main(argv=None) -> int:
     clock = {}
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
-    train, val = split_frames(args.folders, args.seed)
+    splits = split_frames(args.folders, args.seed)
+    train, val = splits["train"], splits["val"]
     print(f"Trees: {len(train)} train, {len(val)} validation (test trees not used)", flush=True)
 
     # ---------------- 1. shape targets
@@ -214,12 +159,8 @@ def main(argv=None) -> int:
     # ---------------- 2. bark maps: out-of-fold for training trees
     start = time.perf_counter()
     folds = KFold(5, shuffle=True, random_state=args.seed)
-    maps_tr = {}
-    for f, (fit_idx, held_idx) in enumerate(folds.split(np.arange(len(train))), start=1):
-        clf = bark_classifier(args.seed).fit(np.concatenate([Xpix[i] for i in fit_idx]),
-                                             np.concatenate([ypix[i] for i in fit_idx]))
-        maps_tr.update(bark_maps(train, held_idx, clf))
-        print(f"  bark maps: fold {f}/5 done", flush=True)
+    maps_tr = out_of_fold_bark_maps(train, Xpix, ypix, folds, args.seed,
+                                    log=lambda m: print(m, flush=True))
     clf = bark_classifier(args.seed).fit(np.concatenate(Xpix), np.concatenate(ypix))
     maps_va = bark_maps(val, range(len(val)), clf)
     bark_tr = np.stack([shapes.map_descriptor(maps_tr[i]) for i in range(len(train))])

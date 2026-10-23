@@ -1,0 +1,7 @@
+step,ms_per_image
+load + resize photo,31.026262850082276
+photo summary,289.214678999906
+ridge prediction,0.989809099883132
+Monte Carlo band,165.71299450006336
+threshold + clean,1.367245700021158
+bark map (pixel classifier),278.32277609986704
