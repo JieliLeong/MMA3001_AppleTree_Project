@@ -10,8 +10,8 @@ MMA3001 RGB-D apple-tree dataset.
 |---|---|---|
 | 1 | Index, pair and audit the data; leakage-safe split by tree | done |
 | 2 | Fill holes in depth (Laplace solvers vs interpolation) | done |
-| 3 | Classify scaffold pixels (rule baseline vs ML) | next |
-| 4 | Skeleton, branch curves (smoothing splines), length (quadrature) | planned |
+| 3 | Find scaffold pixels: baselines (average mask, colour rule) vs logistic regression, random forest, neural network | built |
+| 4 | Performance study, report figures | next |
 
 ## Data facts that affect the method
 
@@ -31,10 +31,14 @@ Checked on tree R01N01, 23 Oct 2026; run the audit to confirm across the dataset
 apple_scaffold/data.py               filename parsing, frame pairing, loaders, grouped split
 apple_scaffold/holes.py              depth-hole filling: Laplace (direct, Jacobi, Gauss-Seidel, SOR)
                                      and griddata / RBF interpolation
+apple_scaffold/features.py           per-pixel features (colour, texture, depth, position)
+apple_scaffold/baselines.py          average-mask and colour-rule baselines
+apple_scaffold/evaluate.py           Dice, IoU, centreline F1, threshold tuning, bootstrap CIs
 scripts/audit_dataset.py             dataset audit: completeness, image properties, split, overlays
 scripts/hole_filling_experiment.py   accuracy, cost and convergence of every fill method
+scripts/scaffold_experiment.py       Stage 3 comparison: train, tune on validation, score on test
 tests/                               pytest tests (manufactured-solution checks for the solvers)
-results/holes/                       experiment CSVs and figures
+results/holes/, results/scaffold/    experiment CSVs and figures
 ```
 
 ## Running in Google Colab
@@ -52,6 +56,9 @@ drive.mount('/content/drive')
 
 # depth-hole filling experiment (training trees only)
 !python scripts/hole_filling_experiment.py /content/data --out results/holes --frames 20
+
+# Stage 3 method comparison (add --fill-depth to use hole-filled depth)
+!python scripts/scaffold_experiment.py /content/data --out results/scaffold
 
 !pytest -v                                   # run the tests
 !pdoc --math ./apple_scaffold -o ./docs      # HTML documentation

@@ -1,0 +1,25 @@
+{
+ "folders": [
+  "/content/data"
+ ],
+ "out": "results/scaffold",
+ "size": 256,
+ "pixels_per_image": 1500,
+ "val_images": 30,
+ "max_train_images": null,
+ "max_test_images": null,
+ "fill_depth": false,
+ "seed": 0,
+ "features_train_s": 23.766536430000997,
+ "fit_logistic_s": 4.269891137999366,
+ "fit_random_forest_s": 163.3598856109984,
+ "fit_rf_no_position_s": 166.69287060399984,
+ "fit_mlp_s": 148.72162338700036,
+ "feature_ms_per_image": 29.262958435334866,
+ "n_train_pixels": 588000,
+ "colour_rule": {
+  "max_saturation": 0.4,
+  "max_exg": 0.1,
+  "min_brightness": 0.2
+ }
+}

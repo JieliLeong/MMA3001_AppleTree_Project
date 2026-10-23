@@ -3,6 +3,7 @@ pandas
 pillow
 scipy
 scikit-learn
+scikit-image
 matplotlib
 pytest
 pdoc
