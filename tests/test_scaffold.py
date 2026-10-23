@@ -116,3 +116,12 @@ def test_colour_rule_finds_pale_bark_not_leaves():
     rule, score = ColourRule.tune([rgb], [gt], min_size=1)
     assert score == pytest.approx(1.0)
     assert (rule.predict_proba(rgb) == gt).all()
+
+
+def test_covered_fraction_counts_saturated_scaffold_pixels():
+    rgb = np.zeros((10, 10, 3), np.uint8)
+    rgb[:] = (150, 145, 140)                 # pale bark everywhere
+    rgb[:5] = (40, 160, 40)                  # top half covered by green leaves
+    mask = np.zeros((10, 10), bool)
+    mask[:, 4:6] = True
+    assert evaluate.covered_fraction(rgb, mask) == pytest.approx(0.5)

@@ -1,0 +1,13 @@
+pipeline,step,ms_per_photo
+shape_final,load + resize photo,32.09808920000796
+shape_final,photo summary,11.084864350232237
+shape_final,bark map,292.0686450001085
+shape_final,ridge prediction,0.919950850038731
+shape_final,Monte Carlo band,184.89628909992462
+shape_final,threshold + clean,1.4246110500607756
+shape_fast,load + resize photo,32.09808920000796
+shape_fast,photo summary,11.221938550261257
+shape_fast,bark map,0.0
+shape_fast,ridge prediction,0.8867569998983527
+shape_fast,Monte Carlo band,47.598248250142206
+shape_fast,threshold + clean,1.4270710507844342

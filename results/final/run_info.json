@@ -1,0 +1,35 @@
+{
+ "config": {
+  "use_bark_map": true,
+  "bark_gain": 0.00631422851128728,
+  "bark_gain_ci": [
+   0.0014220393264017376,
+   0.011856085611898052
+  ],
+  "modes_K": 3,
+  "summary_grid": 8,
+  "centreline_rows": 16,
+  "monte_carlo_M": 800,
+  "pixels_per_tree": 500,
+  "tune_trees": 100,
+  "seed": 0,
+  "validation_dice": 0.4197837588304731,
+  "validation_cl_f1": 0.35880970371832077,
+  "baseline_validation_dice": 0.37006783186232517,
+  "ms_per_image": 766.633767249823,
+  "rules": {
+   "bark map": "keep only if the paired 95% CI of the Dice gain is above 0",
+   "K, grid, rows": "simplest value within 0.005 Dice of the best",
+   "M": "smallest M with band RMS error <= 0.01 and Dice within 0.002 of the largest M"
+  }
+ },
+ "n_dev": 476,
+ "n_test": 85,
+ "threshold_final": 0.25,
+ "threshold_fast": 0.25,
+ "threshold_avg_mask": 0.2,
+ "ridge_alpha_final": 1778.2794100389228,
+ "ridge_alpha_fast": 562.341325190349,
+ "dev_cv_weighted_r2_final": 0.372186215069511,
+ "stage3_compared": true
+}

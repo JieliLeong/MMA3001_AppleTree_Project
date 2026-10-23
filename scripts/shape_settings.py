@@ -313,20 +313,27 @@ def main(argv=None) -> int:
         steps["bark map (pixel classifier)"] = []
     for i in range(min(20, len(val))):
         frame = val.iloc[i]
-        t0 = time.perf_counter(); rgb, depth, _ = load_frame(frame, SIZE); t1 = time.perf_counter()
-        x = shapes.image_descriptor(rgb, depth, grid=GRID_best); t2 = time.perf_counter()
+        # each step is timed on its own, so no step is counted twice
+        t = time.perf_counter()
+        rgb, depth, _ = load_frame(frame, SIZE)
+        steps["load + resize photo"].append(time.perf_counter() - t)
+        t = time.perf_counter()
+        x = shapes.image_descriptor(rgb, depth, grid=GRID_best)
+        steps["photo summary"].append(time.perf_counter() - t)
         if use_bark:
+            t = time.perf_counter()
             prob = clf.predict_proba(pixel_features(rgb, depth)[:, IMAGE_ONLY])[:, 1]
             x = np.concatenate([x, shapes.map_descriptor(prob.reshape(SIZE, SIZE))])
-            steps["bark map (pixel classifier)"].append(time.perf_counter() - t2)
-            t2 = time.perf_counter()
-        c = final["estimator"].predict(x[None])[0]; t3 = time.perf_counter()
-        p = shapes.probability_map(c, final["cov"], final["model"], widths1, M_best, seed); t4 = time.perf_counter()
-        evaluate.clean_mask(p >= final["threshold"]); t5 = time.perf_counter()
-        for name, dt in zip(["load + resize photo", "photo summary", "ridge prediction",
-                             "Monte Carlo band", "threshold + clean"],
-                            [t1 - t0, t2 - t1, t3 - t2, t4 - t3, t5 - t4]):
-            steps[name].append(dt)
+            steps["bark map (pixel classifier)"].append(time.perf_counter() - t)
+        t = time.perf_counter()
+        c = final["estimator"].predict(x[None])[0]
+        steps["ridge prediction"].append(time.perf_counter() - t)
+        t = time.perf_counter()
+        p = shapes.probability_map(c, final["cov"], final["model"], widths1, M_best, seed)
+        steps["Monte Carlo band"].append(time.perf_counter() - t)
+        t = time.perf_counter()
+        evaluate.clean_mask(p >= final["threshold"])
+        steps["threshold + clean"].append(time.perf_counter() - t)
     timing_rows = pd.DataFrame([{"step": k, "ms_per_image": 1000 * np.mean(v)} for k, v in steps.items()])
     timing_rows.to_csv(out / "timing.csv", index=False)
     for r in timing_rows.itertuples():

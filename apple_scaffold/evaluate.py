@@ -97,3 +97,17 @@ def bootstrap_ci(values, n_boot: int = 2000, level: float = 0.95, seed: int = 0)
     means = rng.choice(values, size=(n_boot, len(values)), replace=True).mean(axis=1)
     tail = (1 - level) / 2
     return float(np.quantile(means, tail)), float(np.quantile(means, 1 - tail))
+
+
+def covered_fraction(rgb: np.ndarray, mask: np.ndarray, min_saturation: float = 0.3) -> float:
+    """Share of the scaffold that looks covered by leaves or fruit (occlusion proxy).
+
+    Leaves (green) and apples (red) are strongly saturated colours, while bark,
+    soil and sky are not, so a scaffold pixel whose colour saturation exceeds
+    ``min_saturation`` is counted as covered. This is a proxy, not a measured
+    occlusion.
+    """
+    colour = rgb.astype(np.float32) / 255.0
+    brightest = colour.max(axis=-1)
+    saturation = (brightest - colour.min(axis=-1)) / (brightest + 1e-6)
+    return float(np.mean(saturation[mask] > min_saturation)) if mask.any() else float("nan")
