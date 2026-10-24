@@ -98,10 +98,10 @@
                     <h1 class="modulename">
 <a href="./../apple_scaffold.html">apple_scaffold</a><wbr>.alignment    </h1>
 
-                        <div class="docstring"><p>Do the hand-drawn masks line up with the images?</p>
+                        <div class="docstring"><p>Do the supplied masks line up with the images?</p>
 
-<p>The masks were drawn by hand on a 256 x 256 grid and the photos are squashed to
-that grid (<code><a href="data.html">apple_scaffold.data</a></code>). If the masks had been drawn in a
+<p>The masks are 256 x 256 images (how they were made is not documented) and the
+photos are squashed to that grid (<code><a href="data.html">apple_scaffold.data</a></code>). If the masks had been drawn in a
 different frame - the depth camera's view, a crop of the photo, or the winter
 photo - the truth would be offset from the summer photo by roughly the same
 shift on every tree. If instead the masks are rough sketches, the error differs
@@ -130,10 +130,10 @@ with the image.</p>
 
                         <label class="view-source-button" for="mod-alignment-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">"""Do the hand-drawn masks line up with the images?</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">"""Do the supplied masks line up with the images?</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">The masks were drawn by hand on a 256 x 256 grid and the photos are squashed to</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">that grid (:mod:`apple_scaffold.data`). If the masks had been drawn in a</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">The masks are 256 x 256 images (how they were made is not documented) and the</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">photos are squashed to that grid (:mod:`apple_scaffold.data`). If the masks had been drawn in a</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">different frame - the depth camera's view, a crop of the photo, or the winter</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">photo - the truth would be offset from the summer photo by roughly the same</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="sd">shift on every tree. If instead the masks are rough sketches, the error differs</span>

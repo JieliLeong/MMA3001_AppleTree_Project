@@ -1,4 +1,4 @@
-"""Stage 1b: do the hand-drawn masks line up with the photos?
+"""Stage 1b: do the supplied masks line up with the photos?
 
 Usage (from the repository root)::
 

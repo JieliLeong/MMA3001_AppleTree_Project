@@ -1,7 +1,7 @@
-"""Do the hand-drawn masks line up with the images?
+"""Do the supplied masks line up with the images?
 
-The masks were drawn by hand on a 256 x 256 grid and the photos are squashed to
-that grid (:mod:`apple_scaffold.data`). If the masks had been drawn in a
+The masks are 256 x 256 images (how they were made is not documented) and the
+photos are squashed to that grid (:mod:`apple_scaffold.data`). If the masks had been drawn in a
 different frame - the depth camera's view, a crop of the photo, or the winter
 photo - the truth would be offset from the summer photo by roughly the same
 shift on every tree. If instead the masks are rough sketches, the error differs

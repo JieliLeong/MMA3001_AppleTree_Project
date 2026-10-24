@@ -3,7 +3,7 @@
 Two views of "how good":
 
 * **Area overlap** - Dice and IoU of the predicted and true masks. Strict:
-  the true masks are thick hand-drawn lines, so a correct but thinner
+  the true masks are thick lines, so a correct but thinner
   prediction loses points.
 * **Centreline agreement** - both masks are thinned to one-pixel skeletons.
   A predicted centreline pixel counts as correct if a true centreline pixel

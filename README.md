@@ -5,7 +5,7 @@ MMA3001 Numerical Methods and Machine Learning, individual project (Monash, 2026
 In summer, most of an apple tree's main scaffold (the trunk and the two leaders a
 pruning or harvesting robot must avoid) is hidden behind leaves and fruit. This
 project predicts the scaffold from one summer colour photo and depth image, and
-validates the prediction against hand-drawn ground-truth masks on trees the
+validates the prediction against the supplied ground-truth masks on trees the
 method has never seen.
 
 **Main finding.** Pixel-by-pixel machine-learning models (logistic regression,
@@ -14,10 +14,10 @@ training mask. They mostly learned *where* scaffolds usually are, because the
 scaffold itself is hidden. Treating the scaffold as one **shape**, described by a
 few SVD modes, predicting those modes from the photo with ridge regression, and
 drawing the prediction as a Monte Carlo probability band, did beat the baseline
-on the 85 held-out test trees (see *Evaluation sequence* under
+on the 85 test trees (see *Evaluation sequence* under
 *Validation and verification* for how these trees were used).
 
-## Result on the 85 held-out test trees
+## Result on the 85 test trees
 
 | Method | Dice [95% CI] | Centreline F1, 5 px [95% CI] | Time per photo |
 |---|---|---|---|
@@ -29,8 +29,10 @@ on the 85 held-out test trees (see *Evaluation sequence* under
 
 Paired, tree by tree, final shape method minus baseline: **Dice +0.048
 [+0.028, +0.068], better on 57 of 85 trees**; centreline F1 +0.062 [+0.027,
-+0.098]. The validation estimate (0.420, gain +0.050) matched the test result,
-so the settings did not overfit the validation trees. On centreline F1 the shape
++0.098]. The validation estimate (0.420, gain +0.050) was close to the test
+result (0.434, gain +0.048). That is consistent with little overfitting to the
+validation trees, but with 84-85 trees, and with the test trees already used in
+Stage 3, it does not rule overfitting out. On centreline F1 the shape
 method ties the Stage 3 neural network (+0.019 [-0.013, +0.052]).
 
 Figures: [`results/final/`](results/final) (scores, best / median / worst test
@@ -41,9 +43,9 @@ trees, occlusion check). Full numbers: `results/final/final_summary.csv` and
 
 | | Description |
 |---|---|
-| Input | Summer colour photo (640 x 480, 8-bit RGB) and depth image (640 x 480, 8-bit encoded, `0` = no sensor return). Both are resized to the 256 x 256 grid of the ground-truth masks |
+| Input | Summer colour photo (640 x 480, 8-bit RGB) and depth image (640 x 480, 8-bit encoded, `0` taken to mean no sensor return). Both are resized to the 256 x 256 grid of the ground-truth masks |
 | Output | Probability map (256 x 256, values 0-1) that each pixel is scaffold, a thresholded mask, and the two predicted centreline curves |
-| Ground truth | Hand-drawn 256 x 256 binary masks of trunk + two leaders (561 labelled trees) |
+| Ground truth | Supplied 256 x 256 binary masks of trunk + two leaders (561 labelled trees); how they were made is not documented |
 | Intended use | Perception step for an orchard robot: where the main branches run, in image coordinates |
 | Limits | 2-D only; depth is a relative encoding (not millimetres) and camera intrinsics are unknown, so no metric 3-D lengths |
 
@@ -52,7 +54,7 @@ trees, occlusion check). Full numbers: `results/final/final_summary.csv` and
 | Stage | What | Course link | Outcome |
 |---|---|---|---|
 | 1 | Index, pair and audit the data; split **by tree** into 392 train / 84 validation / 85 test | Weeks 1, 5.6 | 4,981 files; 561 labelled + 544 unlabelled trees; every tree complete |
-| 1b | Check that the hand-drawn masks line up with the images: shift and stretch every mask over its summer and winter photo and depth image, in 5 separate groups of trees | Week 5.5 | No reliable global correction: the groups disagree and the best positions sit at the edge of the search range. The cause of the discrepancies is undetermined (see *Validation*) |
+| 1b | Check that the supplied masks line up with the images: shift and stretch every mask over its summer and winter photo and depth image, in 5 separate groups of trees | Week 5.5 | No reliable global correction: the groups disagree and the best positions sit at the edge of the search range. The cause of the discrepancies is undetermined (see *Validation*) |
 | 2 | Fill depth holes: Laplace equation (direct sparse LU, Jacobi, Gauss-Seidel, SOR) vs griddata / RBF interpolation, on punched holes with known answers | Weeks 2.3, 3.5, 10.1, 11.3 | See `results/holes/`. On test fields the direct solve reproduces an exactly harmonic field to ~1e-11; Jacobi and Gauss-Seidel need ~R^2 iterations, SOR ~R |
 | 3 | Per-pixel classifiers: logistic regression, random forest, MLP vs average-mask and colour-rule baselines | Weeks 5.1-5.6 | Best (MLP) ties the baseline: paired Dice -0.007 [-0.015, +0.002]; x and y position dominate |
 | 4a | Feasibility of a shape representation (two centreline curves, SVD modes) | Weeks 2.3, 3.4 | Redraw Dice 0.91-0.96; 5 modes = 95 % of variation; oracle with 5 true modes 0.76 |
@@ -105,10 +107,10 @@ Confirmed on the full dataset by the audit (`results/audit/`).
 
 | Item | Finding | Consequence |
 |---|---|---|
-| Depth PNG | 8-bit, three identical channels; `0` = no return; larger = farther; max values 152-174 | Relative depth only; no metric 3-D |
-| GT PNG | 256 x 256 binary (0/255) | All scoring on the 256 x 256 grid; photos are squashed to match (checked with overlays) |
+| Depth PNG | 8-bit, three identical channels; max values 152-174. `0` appears where nothing is in range (sky, distant background), so it is taken to mean no return. The direction of the scale is undocumented: on R01N01 values fall along the ground away from the camera, which suggests larger = nearer (not checked across the dataset) | Relative depth only; no metric 3-D. No method or result depends on the direction |
+| GT PNG | 256 x 256 binary (0/255) | All scoring on the 256 x 256 grid; photos are resized (squashed) to match. How the masks were registered to the photos is not documented |
 | GT content | Main trunk + two leaders, drawn as a thick line | Centreline F1 reported alongside Dice |
-| GT accuracy | Smooth hand-drawn Y; on some trees it misses the visible trunk; no reliable global correction over 561 trees (Stage 1b) | Scores measure agreement with the supplied annotations; reported as a limitation |
+| GT accuracy | Smooth Y-shaped masks with visible discrepancies from the trunk on some trees (e.g. R01N01); no reliable global correction found over 561 trees (Stage 1b); annotation accuracy and coordinate mapping unverified | Scores measure agreement with the supplied annotations; reported as a limitation |
 | File times | `h-m-s`, not zero-padded (`12-41-4`) | Names parsed with a regular expression |
 | Re-matched winter files | 104 files named like `R04N15_Winter_RGB-R04N42_RGB_12-19-45.png` | Parser accepts both forms; second ID kept as `source_id` |
 

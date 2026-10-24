@@ -1,4 +1,4 @@
-"""Stage 4d: the final test of the shape method on the 85 held-out test trees.
+"""Stage 4d: the final test of the shape method on the 85 test trees.
 
 Usage (from the repository root)::
 
@@ -248,7 +248,7 @@ def main(argv=None) -> int:
         "stage3_compared": stage3_found}, indent=1, default=float))
 
     # ---------------- print
-    log(f"\nFINAL TEST RESULTS ({len(test)} held-out test trees; mean [95% bootstrap CI])")
+    log(f"\nFINAL TEST RESULTS ({len(test)} test trees; mean [95% bootstrap CI])")
     for r in summary.itertuples():
         log(f"  {r.label:34s} Dice {r.dice:.3f} [{r.dice_lo:.3f}-{r.dice_hi:.3f}]  IoU {r.iou:.3f}  "
             f"centreline F1@5px {r.cl_f1_t5:.3f} [{r.cl_lo:.3f}-{r.cl_hi:.3f}]  "
@@ -296,7 +296,7 @@ def figures(metrics, summary, test, rgbs, test_masks, final, prior_masks, occ, p
     axes[0].set_yticklabels([LABELS[m] for m in order], fontsize=7)
     handles = [plt.Line2D([], [], marker="o", linestyle="", color=c, label=l)
                for l, c in (("baseline", GREY), ("Stage 3 pixel models", LIGHT), ("shape method", PALETTE[0]))]
-    fig.suptitle(f"Final test: every method on the same {len(test)} held-out test trees", fontsize=9)
+    fig.suptitle(f"Final test: every method on the same {len(test)} test trees", fontsize=9)
     fig.tight_layout(rect=(0, 0.07, 1, 1))
     fig.legend(handles=handles, loc="lower center", ncol=3, fontsize=7)
     fig.savefig(out / "fig_final_scores.png")

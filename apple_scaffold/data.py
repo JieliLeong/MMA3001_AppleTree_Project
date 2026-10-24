@@ -16,9 +16,11 @@ One *frame* is the set of files for one tree in one season. Findings from the
 R01N01 sample (23 Oct 2026) that shape the loaders below:
 
 * Depth PNGs are 8-bit greyscale saved as three identical RGB channels.
-  ``0`` means no sensor return; larger values are farther away. Values are a
-  rescaled encoding, **not millimetres**, so metric 3D needs the scale from
-  the dataset provider.
+  ``0`` is taken to mean no sensor return (it covers sky and distant
+  background). The direction of the scale is undocumented; on R01N01 values
+  fall along the ground away from the camera, suggesting larger = nearer.
+  Values are a rescaled encoding, **not millimetres**, so metric 3D needs the
+  scale from the dataset provider. No method here depends on the direction.
 * GT masks are 256 x 256 binary images, whereas RGB and depth are 640 x 480.
   The mask must be resized (non-uniformly: 2.5x in x, 1.875x in y) before it
   can be compared with an RGB or depth pixel.

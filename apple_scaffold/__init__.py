@@ -4,7 +4,7 @@ Modules, in the order the project uses them:
 
 * `apple_scaffold.data` - parse file names, pair each tree's files, load images,
   split trees into train / validation / test without leakage.
-* `apple_scaffold.alignment` - check whether the hand-drawn masks line up with
+* `apple_scaffold.alignment` - check whether the supplied masks line up with
   the images (shift / stretch registration by conditional mutual information).
 * `apple_scaffold.holes` - fill missing depth by solving Laplace's equation
   (direct sparse LU, Jacobi, Gauss-Seidel, SOR) or by scattered-data interpolation.
