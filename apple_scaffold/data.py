@@ -35,16 +35,9 @@ from PIL import Image
 
 FILENAME_RE = re.compile(
     r"^(?P<row>R\d+)(?P<kind>[NU])(?P<tree>\d+)_(?P<season>[A-Za-z]+)_"
-    r"(?P<modality>D|RGB|GT)-"
-    r"(?:(?P<source>R\d+[NU]\d+)_[A-Za-z]+_)?"
-    r"(?P<h>\d{1,2})-(?P<m>\d{1,2})-(?P<s>\d{1,2})\.png$"
+    r"(?P<modality>D|RGB|GT)-(?P<h>\d{1,2})-(?P<m>\d{1,2})-(?P<s>\d{1,2})\.png$"
 )
-"""Regular expression for a dataset file name (see module docstring).
-
-Some winter files carry a second tree ID, e.g.
-``R04N15_Winter_RGB-R04N42_RGB_12-19-45.png``. The first ID is the tree the
-frame belongs to; the second (``source``) is the ID from the winter capture.
-"""
+"""Regular expression for a dataset file name (see module docstring)."""
 
 FRAME_SIZE = (640, 480)
 """(width, height) of the RGB and depth images."""
@@ -68,8 +61,7 @@ def parse_filename(name: str) -> dict | None:
     -------
     dict or None
         Keys ``tree_id`` (e.g. ``"R01N03"``), ``row``, ``labelled`` (bool),
-        ``season``, ``modality``, ``time_s`` (seconds after midnight) and
-        ``source_id`` (the second ID in re-matched winter names, else ``None``).
+        ``season``, ``modality`` and ``time_s`` (seconds after midnight).
         ``None`` if the name does not match the dataset pattern.
     """
     match = FILENAME_RE.match(name)
@@ -83,7 +75,6 @@ def parse_filename(name: str) -> dict | None:
         "season": g["season"],
         "modality": g["modality"],
         "time_s": int(g["h"]) * 3600 + int(g["m"]) * 60 + int(g["s"]),
-        "source_id": g["source"],
     }
 
 
@@ -107,8 +98,7 @@ def index_files(folders: Iterable[str | Path]) -> tuple[pd.DataFrame, list[Path]
                 unmatched.append(path)
             else:
                 rows.append({**fields, "path": path})
-    columns = ["tree_id", "row", "labelled", "season", "modality", "time_s",
-               "source_id", "path"]
+    columns = ["tree_id", "row", "labelled", "season", "modality", "time_s", "path"]
     return pd.DataFrame(rows, columns=columns), unmatched
 
 
