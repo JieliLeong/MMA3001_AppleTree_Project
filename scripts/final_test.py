@@ -103,6 +103,8 @@ def main(argv=None) -> int:
     parser.add_argument("--config", default="results/shape_settings/final_config.json")
     parser.add_argument("--stage3", default="results/scaffold/metrics.csv")
     parser.add_argument("--out", default="results/final")
+    parser.add_argument("--save-masks", action="store_true",
+                        help="also save every test mask to test_masks.npz (for the all-methods figure)")
     args = parser.parse_args(argv)
     if not Path(args.config).exists():
         raise SystemExit(f"{args.config} not found: run Stage 4c first.")
@@ -171,6 +173,11 @@ def main(argv=None) -> int:
         log(f"Note: {args.stage3} not found; Stage 3 methods are not compared")
     metrics = pd.concat(frames, ignore_index=True)
     metrics.to_csv(out / "final_metrics.csv", index=False)
+    if args.save_masks:
+        np.savez_compressed(out / "test_masks.npz", tree_id=test.tree_id.to_numpy().astype(str),
+                            truth=np.stack(test_masks), shape_final=np.stack(final["masks"]),
+                            shape_fast=np.stack(fast["masks"]), avg_mask=np.stack(prior_masks))
+        log(f"Saved the test masks to {out / 'test_masks.npz'}")
 
     summary = []
     for method, m in metrics.groupby("method", sort=False):

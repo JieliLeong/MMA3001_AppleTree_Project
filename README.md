@@ -36,7 +36,9 @@ Stage 3, it does not rule overfitting out. On centreline F1 the shape
 method ties the Stage 3 neural network (+0.019 [-0.013, +0.052]).
 
 Figures: [`results/final/`](results/final) (scores, best / median / worst test
-trees, occlusion check). Full numbers: `results/final/final_summary.csv` and
+trees, occlusion check) and
+[`results/gallery/fig_all_methods.png`](results/gallery/fig_all_methods.png)
+(every method's predicted mask on the same three test trees). Full numbers: `results/final/final_summary.csv` and
 `paired.csv`.
 
 ## Inputs and outputs
@@ -121,7 +123,7 @@ The dataset belongs to its providers and is **not** included in this repository.
 1. Put the two dataset zip files in a Google Drive folder `MyDrive/MMA3001_data`.
 2. Open [`notebooks/run_all.ipynb`](notebooks/run_all.ipynb) in Google Colab and
    choose **Runtime > Run all**. It clones this repository, unpacks the data,
-   runs the tests and every stage in order (about 65 minutes in total), and
+   runs the tests and every stage in order (about 75 minutes in total), and
    rebuilds the documentation.
 
 Everything is seeded, so a rerun gives the same scores; only run times vary.
@@ -145,7 +147,7 @@ apple_scaffold/            the package
   evaluate.py              Dice, IoU, centreline F1, thresholds, bootstrap CIs, occlusion proxy
   shapes.py                centreline description, PCHIP drawing, SVD shape model, Monte Carlo band
   shape_pipeline.py        shared steps of the shape method
-scripts/                   one script per stage (audit, alignment_check, holes, scaffold, shape_*, final_test)
+scripts/                   one script per stage (audit, alignment_check, holes, scaffold, shape_*, final_test, method_gallery)
 tests/                     pytest tests, including manufactured-solution checks
 results/                   CSVs and figures, one folder per stage
 notebooks/run_all.ipynb    reproduces everything in Colab
