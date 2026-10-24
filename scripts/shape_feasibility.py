@@ -4,8 +4,8 @@ Usage (from the repository root)::
 
     python scripts/shape_feasibility.py /content/data --out results/shape_check
 
-Uses training and validation trees only; the test trees stay untouched for the
-final evaluation. Four questions:
+Uses training and validation trees only; the test trees are not used here, and
+the shape method is scored on them once, in Stage 4d. Four questions:
 
 1. **Representation** - if a tree is described by two centreline curves and
    drawn back, how close is it to the original mask? (upper limit)

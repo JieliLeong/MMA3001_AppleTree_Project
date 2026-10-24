@@ -4,8 +4,8 @@ Usage (from the repository root)::
 
     python scripts/shape_settings.py /content/data --out results/shape_settings
 
-Everything here uses training and validation trees only, so the final test
-(Stage 4d) is still a single, untouched evaluation. Settings are varied one at
+Everything here uses training and validation trees only, so the shape method
+is scored on the test trees only once (Stage 4d). Settings are varied one at
 a time around a base configuration (ridge, coarse summary on a 16 x 16 grid,
 K = 8 modes, 32 centreline rows, M = 200 Monte Carlo shapes), and each is
 chosen by a rule stated *before* looking at the numbers:

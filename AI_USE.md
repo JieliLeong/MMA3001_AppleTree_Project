@@ -50,8 +50,9 @@ Approximate share of the code drafted by AI: *write your own estimate and reason
 10. **Mask alignment taken on trust.** The audit only overlaid the masks on summer photos,
     where the scaffold is hidden by leaves, and the AI treated that as confirmation that
     the masks fit. I noticed after the final test that the outline misses the visible
-    trunk; the Stage 1b check over 561 trees then found no consistent offset, so the
-    masks are approximate sketches (a limitation, not a bug).
+    trunk; the Stage 1b check over 561 trees found no reliable global correction. The
+    cause (approximate annotation, image correspondence or coordinate mapping) is
+    undetermined, so all scores are reported as agreement with the supplied annotations.
 
 ## 4. How I checked the AI's work
 
