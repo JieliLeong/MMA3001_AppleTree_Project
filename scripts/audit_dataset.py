@@ -76,7 +76,11 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     files, unmatched = data.index_files(args.folders)
+    others = sorted({p.name for folder in args.folders for p in Path(folder).rglob("*")
+                     if p.is_file() and p.suffix.lower() != ".png"})
     print(f"{len(files)} dataset files, {len(unmatched)} unmatched PNGs")
+    print(f"{int(files['source_id'].notna().sum())} files use the re-matched winter name form")
+    print(f"non-PNG files ignored: {others}")
     for path in unmatched[:10]:
         print("  unmatched:", path)
     if files.empty:

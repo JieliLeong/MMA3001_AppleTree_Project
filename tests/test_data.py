@@ -49,6 +49,25 @@ def test_parse_unpadded_time():
     assert fields["season"] == "Summer"
     assert fields["modality"] == "GT"
     assert fields["time_s"] == 12 * 3600 + 41 * 60 + 4
+    assert fields["source_id"] is None
+
+
+def test_parse_rematched_winter_name():
+    fields = data.parse_filename("R04N15_Winter_RGB-R04N42_RGB_12-19-45.png")
+    assert fields["tree_id"] == "R04N15"
+    assert fields["season"] == "Winter"
+    assert fields["modality"] == "RGB"
+    assert fields["source_id"] == "R04N42"
+    assert fields["time_s"] == 12 * 3600 + 19 * 60 + 45
+
+
+def test_rematched_winter_files_pair_into_one_clean_frame(tmp_path):
+    write_png(tmp_path / "R04N06_Winter_D-R04N18_RGB_12-18-07.png", fake_depth())
+    write_png(tmp_path / "R04N06_Winter_RGB-R04N18_RGB_12-18-07.png", fake_rgb())
+    files, unmatched = data.index_files([tmp_path])
+    frames = data.build_frames(files)
+    assert unmatched == []
+    assert len(frames) == 1 and frames.iloc[0].problems == ""
 
 
 def test_parse_unlabelled_tree():
