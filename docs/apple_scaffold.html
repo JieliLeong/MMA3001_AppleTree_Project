@@ -46,6 +46,7 @@
 
             <h2>Submodules</h2>
             <ul>
+                    <li><a href="apple_scaffold/alignment.html">alignment</a></li>
                     <li><a href="apple_scaffold/baselines.html">baselines</a></li>
                     <li><a href="apple_scaffold/data.html">data</a></li>
                     <li><a href="apple_scaffold/evaluate.html">evaluate</a></li>
@@ -76,6 +77,8 @@ apple_scaffold    </h1>
 <ul>
 <li><code><a href="apple_scaffold/data.html">apple_scaffold.data</a></code> - parse file names, pair each tree's files, load images,
 split trees into train / validation / test without leakage.</li>
+<li><code><a href="apple_scaffold/alignment.html">apple_scaffold.alignment</a></code> - check whether the hand-drawn masks line up with
+the images (shift / stretch registration by conditional mutual information).</li>
 <li><code><a href="apple_scaffold/holes.html">apple_scaffold.holes</a></code> - fill missing depth by solving Laplace's equation
 (direct sparse LU, Jacobi, Gauss-Seidel, SOR) or by scattered-data interpolation.</li>
 <li><code><a href="apple_scaffold/features.html">apple_scaffold.features</a></code> - per-pixel features for the Stage 3 classifiers.</li>
@@ -100,18 +103,20 @@ back (PCHIP), SVD shape model, Monte Carlo probability band.</li>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">* `apple_scaffold.data` - parse file names, pair each tree's files, load images,</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">  split trees into train / validation / test without leakage.</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">* `apple_scaffold.holes` - fill missing depth by solving Laplace's equation</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">  (direct sparse LU, Jacobi, Gauss-Seidel, SOR) or by scattered-data interpolation.</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">* `apple_scaffold.features` - per-pixel features for the Stage 3 classifiers.</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">* `apple_scaffold.baselines` - the average-mask and colour-rule baselines.</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">* `apple_scaffold.evaluate` - Dice, IoU, centreline F1, threshold tuning,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">  bootstrap confidence intervals, occlusion proxy.</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">* `apple_scaffold.shapes` - describe a scaffold as two centreline curves, draw it</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">  back (PCHIP), SVD shape model, Monte Carlo probability band.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">* `apple_scaffold.shape_pipeline` - the shared steps of the final shape method.</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">The experiments that use these modules are in ``scripts/``; results are in ``results/``.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">"""</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">* `apple_scaffold.alignment` - check whether the hand-drawn masks line up with</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">  the images (shift / stretch registration by conditional mutual information).</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">* `apple_scaffold.holes` - fill missing depth by solving Laplace's equation</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">  (direct sparse LU, Jacobi, Gauss-Seidel, SOR) or by scattered-data interpolation.</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">* `apple_scaffold.features` - per-pixel features for the Stage 3 classifiers.</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">* `apple_scaffold.baselines` - the average-mask and colour-rule baselines.</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">* `apple_scaffold.evaluate` - Dice, IoU, centreline F1, threshold tuning,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">  bootstrap confidence intervals, occlusion proxy.</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">* `apple_scaffold.shapes` - describe a scaffold as two centreline curves, draw it</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">  back (PCHIP), SVD shape model, Monte Carlo probability band.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">* `apple_scaffold.shape_pipeline` - the shared steps of the final shape method.</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">The experiments that use these modules are in ``scripts/``; results are in ``results/``.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">"""</span>
 </span></pre></div>
 
 

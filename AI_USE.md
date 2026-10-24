@@ -18,6 +18,7 @@ replace.
 |---|---|---|
 | Planning | Read the project brief and my Week 1-11 notes (OCR of the notebook PDFs); mapped course topics to the project; proposed the stage plan | Supplied the brief, notes and dataset; chose the apple-tree project; decided the core would be an ML method comparison against a baseline |
 | 1 Data | Found the 8-bit depth encoding, 256 x 256 masks and the re-matched winter file names; wrote `data.py`, `scripts/audit_dataset.py` and tests | Ran the audit on the full dataset in Colab; checked the overlays and file counts |
+| 1b Mask alignment | After I pointed out the mismatch, wrote `alignment.py`, `scripts/alignment_check.py`, tests and the notebook | Noticed that the truth outline misses the real trunk; ran the check on all 561 trees |
 | 2 Hole filling | Wrote `holes.py` (Laplace solvers, interpolators), tests with manufactured solutions, and the experiment | Decided to keep this stage and judge it at the end |
 | 3 Pixel models | Wrote features, baselines, metrics and the comparison experiment | Ran it; asked whether a baseline was needed and how many methods to compare |
 | 4a-4d Shape method | After Stage 3 showed the pixel models only learn position, proposed predicting the scaffold as a shape; wrote `shapes.py`, `shape_pipeline.py`, the four scripts, tests and notebooks | Ran every notebook on the real data; asked for the work to be thorough; checked how validation works |
@@ -46,6 +47,11 @@ Approximate share of the code drafted by AI: *write your own estimate and reason
    photo); noticed when checking the printed numbers, fixed in Stage 4d.
 9. **Speed claim corrected:** the AI first estimated ~35 ms per photo, which assumed
    settings the rules did not choose (the final method takes ~520 ms; the fast variant ~90 ms).
+10. **Mask alignment taken on trust.** The audit only overlaid the masks on summer photos,
+    where the scaffold is hidden by leaves, and the AI treated that as confirmation that
+    the masks fit. I noticed after the final test that the outline misses the visible
+    trunk; the Stage 1b check over 561 trees then found no consistent offset, so the
+    masks are approximate sketches (a limitation, not a bug).
 
 ## 4. How I checked the AI's work
 

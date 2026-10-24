@@ -56,7 +56,7 @@ plt.rcParams.update({
 })
 SOURCES = ["summer colour", "summer depth", "winter colour", "winter depth"]
 SIZE, BLOCK = 256, 32
-SCALES = [round(v, 2) for v in np.arange(0.80, 1.251, 0.05)]
+SCALES = [round(float(v), 2) for v in np.arange(0.80, 1.251, 0.05)]
 
 
 def log(message: str) -> None:
