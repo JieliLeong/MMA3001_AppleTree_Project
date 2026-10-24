@@ -60,7 +60,7 @@ trees, occlusion check). Full numbers: `results/final/final_summary.csv` and
 | 4d | Final test: retrain on train + validation, score once on the test trees | Week 5.5.10 | Table above |
 
 ## Validation and verification
-
+* **Ground-truth alignment:** Visual inspection revealed discrepancies between the supplied masks and visible trunk and branch locations. A registration analysis   explored shifts and stretches across summer and winter observations but did not establish a reliable global correction. This does not determine whether the        discrepancies arise from annotation approximation, image correspondence or coordinate mapping. Consequently, Dice, IoU and centreline F1 quantify agreement with   the supplied annotations. They do not independently establish accurate localisation of the physical branches. Comparisons use the same reference masks, but        annotation errors may affect different methods differently.
 * **Known ground truth on withheld data:** every score compares a predicted mask
   with a hand-drawn mask on trees not used for learning; the test trees were
   used once, at the end.
