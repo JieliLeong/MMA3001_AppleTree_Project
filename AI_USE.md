@@ -56,24 +56,18 @@ Approximate share of the code drafted by AI: *write your own estimate and reason
 
 ## 4. How I checked the AI's work
 
-*Write in your own words. For example: which tests you ran and read; which numbers you
-compared between stages (validation vs test); which figures you inspected; which parts of
-the code you read line by line; anything you re-derived by hand (e.g. Dice on a small
-example, the arithmetic-intensity estimate).*
+*I ran the supplied code in Google Colab and inspected the displayed results and figures. The final recorded test output reported 67 tests passing. I relied on AI explanations to interpret the tests and did not independently verify every calculation or read every line of code. My most important visual check was comparing the supplied scaffold outlines with the tree photographs. I noticed that some outlines did not follow the visible trunk and branches, and questioned the earlier interpretation of the results. An AI-assisted alignment investigation did not establish a reliable global correction. The documentation was therefore revised to acknowledge that the cause remains uncertain and that the scores measure agreement with the supplied annotations.*
 
 ## 5. Decisions that were mine
 
-*Write in your own words: choice of project and core question; keeping Stage 2; accepting
-the shape-method reframing; insisting on thoroughness; anything you rejected.*
+*I questioned whether the baseline was appropriate and whether the results were sufficient to support the project’s conclusions. I also raised the mismatch between the reference outlines and the visible trees rather than accepting the numerical scores alone. Many implementation and modelling choices were suggested by AI. My role included running the notebook, inspecting outputs, identifying confusing or questionable results, and requesting explanations and corrections. I do not claim that I independently designed all the methods.*
 
 ## 6. Effect on my understanding and workflow
 
-*Write in your own words: what you understand now that you did not before (e.g. why the
-pixel models only learned position, why a fuzzy band beats a thin line, leakage-safe
-splitting, Monte Carlo convergence); where AI helped or slowed you down.*
+*AI helped me produce and run code, troubleshoot errors, interpret figures and improve the documentation. However, the code developed faster than my understanding. Terms such as KNN, ridge regression, shape modes and Monte Carlo sampling were initially confusing, and I needed repeated explanations in simpler language. The explanations helped me distinguish the average-mask baseline, which predicts the same typical shape for every tree, from methods that use image information to adjust the prediction. I also learned that a higher Dice score means better agreement with the supplied mask, rather than a directly measured percentage of physical branches reconstructed correctly. I still need to strengthen my understanding of the mathematical details.*
 
 ## 7. Limitations
 
-*Write in your own words: what you would check further or do differently.*
+*My reliance on AI limited my ability to check every implementation detail independently. Passing software tests and obtaining plausible figures were useful checks, but they did not establish that the supplied annotations were correctly aligned or that the physical branches were accurately located. If repeating the project, I would inspect image–mask correspondence earlier, develop a smaller working example first, and explain each method in my own words before adding another. I would also keep the final test results unavailable until development choices were complete. In this project, the same 85 test trees were evaluated in Stage 3 and again after later development, which limits claims about an untouched final evaluation. AI also assisted with drafting this reflection. I am responsible for reviewing it and ensuring that it accurately describes my contribution and experience.*
 
 The presentation and interview answers are my own; AI was not used for them.
