@@ -9,8 +9,8 @@ replace.
 
 | Tool | Version | Used for |
 |---|---|---|
-| Claude (Anthropic) | Claude Opus 5.5, Claude app, 23-24 Oct 2026 | Planning, code drafting, Colab notebooks, interpreting results |
-| *other tools, e.g. Gemini in Colab* | | |
+| Claude (Anthropic) | Claude Opus 5.5, Claude app | Project planning, code and test drafting, Colab notebooks, troubleshooting and documentation |
+| ChatGPT (OpenAI) | ChatGPT; model version not recorded| Explaining methods, reviewing figures and claims, drafting and revising report sections and the AI reflection|
 
 ## 2. What the AI produced
 
